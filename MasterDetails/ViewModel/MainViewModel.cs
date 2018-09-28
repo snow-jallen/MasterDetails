@@ -1,5 +1,13 @@
-﻿using GalaSoft.MvvmLight;
+﻿using Com.CloudRail.SI.Interfaces;
+using Com.CloudRail.SI.Types;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.CommandWpf;
 using MasterDetails.Model;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace MasterDetails.ViewModel
 {
@@ -55,11 +63,61 @@ namespace MasterDetails.ViewModel
                 });
         }
 
-        ////public override void Cleanup()
-        ////{
-        ////    // Clean up if needed
+        private string searchTerm = null;
+        public string SearchTerm
+        {
+            get { return searchTerm; }
+            set { Set(nameof(SearchTerm), ref searchTerm, value, true); }
+        }
 
-        ////    base.Cleanup();
-        ////}
+        private RelayCommand search;
+        public RelayCommand Search => search ?? (search = new RelayCommand(
+            () =>
+            {
+                _dataService.Login(VideoService.YouTube);
+                var results = _dataService.Search(SearchTerm);
+                VideoList = new BindingList<MyVideoMetaData>(results.ToList());
+            },
+            () => (SearchTerm ?? String.Empty) != String.Empty));
+        
+        private MyVideoMetaData selectedVideo = null;
+        public MyVideoMetaData SelectedVideo
+        {
+            get { return selectedVideo; }
+            set
+            {
+                Set(nameof(SelectedVideo), ref selectedVideo, value, true);
+            }
+        }
+
+        private BindingList<MyVideoMetaData> videoList;
+        public BindingList<MyVideoMetaData> VideoList { get { return videoList; }
+            set
+            {
+                Set(nameof(VideoList), ref videoList, value, true);
+            }
+        }
+    }
+
+    public class DemoViewModel : INotifyPropertyChanged
+    {
+
+        #region INotifyPropertyChanged Implementation
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value))
+                return false;
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+        #endregion
+
     }
 }
