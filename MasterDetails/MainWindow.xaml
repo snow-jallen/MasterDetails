@@ -22,18 +22,22 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width=".5*" />
             <ColumnDefinition Width="3*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Search" />
+        <TextBlock Text="Search"
+                   Margin="5,0" />
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Stretch"
+                    Margin="5"
                     Grid.Row="1">
             <TextBox Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"
                      MinWidth="75" />
@@ -41,31 +45,53 @@
                     Command="{Binding Search}" />
         </StackPanel>
         <TextBlock Text="Results"
+                   Margin="5,0"
                    Grid.Row="2" />
         <ListBox ItemsSource="{Binding VideoList}"
                  SelectedItem="{Binding SelectedVideo}"
                  DisplayMemberPath="Title"
-                 Grid.Row="3">
-            <!--<ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel>
-                    <TextBlock Text="{Binding Title}" FontWeight="Bold" />
-            <TextBloxk ... />
-            <Image />
-            </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>-->
+                 Grid.Row="3"
+                 Margin="5">
         </ListBox>
 
-        <StackPanel Grid.Column="1"
-                    Grid.RowSpan="6"
-                    DataContext="{Binding SelectedVideo}">
-            <TextBlock Text="Video ID" />
-            <TextBlock Text="{Binding VideoId}" />
-            <TextBlock Text="Title" />
-            <TextBlock Text="{Binding Title}" />
-            <TextBlock Text="Description" />
-            <TextBlock Text="{Binding Description}" />            
-        </StackPanel>
+
+        <TextBlock Text="Video ID"
+                   Grid.Row="0"
+                   Grid.Column="1"
+                   VerticalAlignment="Center" />
+        <TextBlock Text="{Binding SelectedVideo.VideoId}"
+                   Grid.Row="0"
+                   Grid.Column="2"
+                   VerticalAlignment="Center" />
+        <TextBlock Text="Title"
+                   Grid.Row="1"
+                   Grid.Column="1"
+                   VerticalAlignment="Center" />
+        <TextBox Text="{Binding SelectedVideo.Title}"
+                 Grid.Row="1"
+                 Grid.Column="2"
+                 Margin="5"
+                 VerticalAlignment="Center" />
+        <TextBlock Text="Description"
+                   Grid.Row="2"
+                   Grid.Column="1" />
+        <TextBox Text="{Binding SelectedVideo.Description}"
+                 Grid.Row="2"
+                 VerticalAlignment="Top"
+                 Margin="5"
+                 Grid.RowSpan="2"
+                 Grid.Column="2"
+                 Height="120"
+                 AcceptsReturn="True"/>
+
+        <Button Grid.Row="5"
+                Grid.Column="0" Margin="5"
+                Content="Save"
+                Command="{Binding Save}" />
+        <TextBox Grid.Row="5"
+                 Grid.Column="1"
+                 Grid.ColumnSpan="2"
+                 Margin="5"
+                 Text="{Binding ExportPath}" />
     </Grid>
 </Window>

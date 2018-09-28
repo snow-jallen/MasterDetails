@@ -10,8 +10,6 @@ namespace MasterDetails.Model
 {
     public interface IDataService
     {
-        void GetData(Action<DataItem, Exception> callback);
-        void Login(VideoService videoService);
-        IEnumerable<MyVideoMetaData> Search(string searchTerm);
+        IEnumerable<Video> Search(string searchTerm);
     }
 }

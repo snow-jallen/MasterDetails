@@ -3,9 +3,11 @@ using Com.CloudRail.SI.Types;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using MasterDetails.Model;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -50,17 +52,7 @@ namespace MasterDetails.ViewModel
         public MainViewModel(IDataService dataService)
         {
             _dataService = dataService;
-            _dataService.GetData(
-                (item, error) =>
-                {
-                    if (error != null)
-                    {
-                        // Report error here
-                        return;
-                    }
-
-                    WelcomeTitle = item.Title;
-                });
+            ExportPath = "videos.json";
         }
 
         private string searchTerm = null;
@@ -74,14 +66,13 @@ namespace MasterDetails.ViewModel
         public RelayCommand Search => search ?? (search = new RelayCommand(
             () =>
             {
-                _dataService.Login(VideoService.YouTube);
                 var results = _dataService.Search(SearchTerm);
-                VideoList = new BindingList<MyVideoMetaData>(results.ToList());
+                VideoList = new BindingList<Video>(results.ToList());
             },
             () => (SearchTerm ?? String.Empty) != String.Empty));
         
-        private MyVideoMetaData selectedVideo = null;
-        public MyVideoMetaData SelectedVideo
+        private Video selectedVideo = null;
+        public Video SelectedVideo
         {
             get { return selectedVideo; }
             set
@@ -90,34 +81,28 @@ namespace MasterDetails.ViewModel
             }
         }
 
-        private BindingList<MyVideoMetaData> videoList;
-        public BindingList<MyVideoMetaData> VideoList { get { return videoList; }
+        private BindingList<Video> videoList;
+        public BindingList<Video> VideoList { get { return videoList; }
             set
             {
                 Set(nameof(VideoList), ref videoList, value, true);
             }
         }
-    }
 
-    public class DemoViewModel : INotifyPropertyChanged
-    {
-
-        #region INotifyPropertyChanged Implementation
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private string exportPath;
+        public string ExportPath
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            get { return exportPath; }
+            set { Set(ref exportPath, value); }
         }
+        
+        private RelayCommand save;
+        public RelayCommand Save => save ?? (save = new RelayCommand(
+            () =>
+            {
+                var contents = JsonConvert.SerializeObject(VideoList, Formatting.Indented);
+                File.WriteAllText(ExportPath, contents);
+            }));
+    }    
 
-        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(field, value))
-                return false;
-            field = value;
-            OnPropertyChanged(propertyName);
-            return true;
-        }
-        #endregion
-
-    }
 }
